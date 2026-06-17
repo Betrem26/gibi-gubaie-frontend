@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { UserPlus, X } from "lucide-react";
-import { Department, GibiRole } from "@/types/index";
+import { Department, GibiRole, DEPARTMENTS, GIBI_ROLES } from "@/types/index";
 
-const DEPARTMENTS = Object.values(Department);
-const ROLES = Object.values(GibiRole);
+const DEPARTMENTS_LIST = DEPARTMENTS;
+const ROLES = GIBI_ROLES;
 
 const DEPT_LABELS: Record<Department, string> = {
   EDUCATION: "Education",
@@ -145,7 +145,7 @@ export default function AddMemberForm() {
                     name="department" required
                     className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all bg-white"
                   >
-                    {DEPARTMENTS.map((d) => (
+                    {DEPARTMENTS_LIST.map((d) => (
                       <option key={d} value={d}>{DEPT_LABELS[d]}</option>
                     ))}
                   </select>

@@ -4,6 +4,11 @@ export type Department =
   | "EDUCATION" | "CHOIR" | "FINANCE" | "PUBLIC_RELATIONS"
   | "RESEARCH"  | "CHARITY" | "SUNDAY_SCHOOL" | "MAHIBER";
 
+export const DEPARTMENTS: Department[] = [
+  "EDUCATION", "CHOIR", "FINANCE", "PUBLIC_RELATIONS",
+  "RESEARCH", "CHARITY", "SUNDAY_SCHOOL", "MAHIBER",
+];
+
 export type CouncilSection =
   | "MAIN_OFFICE" | "EDUCATION" | "CHOIR" | "FINANCE"
   | "PUBLIC_RELATIONS" | "RESEARCH" | "CHARITY" | "BATCH_COORDINATION";
@@ -13,6 +18,10 @@ export type CouncilRole =
   | "TREASURER" | "COORDINATOR" | "MEMBER";
 
 export type GibiRole = "ADMIN" | "DEPARTMENT_HEAD" | "SECRETARY" | "TREASURER" | "MEMBER";
+
+export const GIBI_ROLES: GibiRole[] = [
+  "ADMIN", "DEPARTMENT_HEAD", "SECRETARY", "TREASURER", "MEMBER",
+];
 
 export type SpiritualTitle = "DEACON" | "SUBDEACON" | "READER" | "ZEMARI" | "NONE";
 

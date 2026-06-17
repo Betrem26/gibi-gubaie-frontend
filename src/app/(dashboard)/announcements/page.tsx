@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { apiFetch } from "@/lib/api";
 import AnnouncementsClient from "@/components/announcements-client";
+import type { AnnouncementItem } from "@/types/index";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = { title: "Announcements" };
 
 export default async function AnnouncementsPage() {
-  const announcements = await apiFetch<object[]>("/api/announcements").catch(() => []);
+  const announcements = await apiFetch<AnnouncementItem[]>("/api/announcements").catch(() => [] as AnnouncementItem[]);
   return (
     <div className="space-y-5">
       <div>

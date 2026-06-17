@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Search, SlidersHorizontal, Pencil, X, Check } from "lucide-react";
-import { Department, GibiRole } from "@/types/index";
+import { Department, GibiRole, DEPARTMENTS, GIBI_ROLES } from "@/types/index";
 import { MemberWithStats } from "@/types";
 
 const DEPT_LABELS: Record<Department, string> = {
@@ -115,7 +115,7 @@ function EditMemberModal({
               <label className="block text-xs font-semibold text-slate-600 mb-1.5">Department</label>
               <select name="department" defaultValue={member.department}
                 className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-                {Object.values(Department).map((d) => (
+                {DEPARTMENTS.map((d) => (
                   <option key={d} value={d}>{DEPT_LABELS[d]}</option>
                 ))}
               </select>
@@ -124,7 +124,7 @@ function EditMemberModal({
               <label className="block text-xs font-semibold text-slate-600 mb-1.5">Role</label>
               <select name="role" defaultValue={member.role}
                 className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
-                {Object.values(GibiRole).map((r) => (
+                {GIBI_ROLES.map((r) => (
                   <option key={r} value={r}>{r.replace("_", " ")}</option>
                 ))}
               </select>

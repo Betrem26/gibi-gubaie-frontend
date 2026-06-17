@@ -14,7 +14,7 @@ export default async function AttendancePage() {
     apiFetch<{ presentIds: string[] }>(`/api/attendance?eventName=${encodeURIComponent(eventName)}&eventDate=${today}`).catch(() => ({ presentIds: [] })),
   ]);
 
-  const members = allMembers.filter((m: unknown & { isActive?: boolean }) => (m as { isActive?: boolean }).isActive !== false);
+  const members = allMembers.filter((m) => m.isActive !== false);
 
   return (
     <div className="space-y-5">
@@ -26,7 +26,7 @@ export default async function AttendancePage() {
         </p>
       </div>
       <AttendanceClientPage
-        members={members as never}
+        members={members}
         initialEventName={eventName}
         initialEventDate={today}
         initialPresent={attendance.presentIds}
