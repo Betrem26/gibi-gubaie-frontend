@@ -1,16 +1,25 @@
 import type { Metadata } from "next";
 import { apiFetch } from "@/lib/api";
 import AttendanceClientPage from "@/components/attendance-client-page";
+import type { Department } from "@/types/index";
 
 export const metadata: Metadata = { title: "Attendance" };
 export const dynamic = "force-dynamic";
+
+type MemberSummary = {
+  id: string;
+  name: string;
+  universityId: string;
+  department: Department;
+  isActive: boolean;
+};
 
 export default async function AttendancePage() {
   const today     = new Date().toISOString().split("T")[0];
   const eventName = "Weekly Meeting";
 
   const [allMembers, attendance] = await Promise.all([
-    apiFetch<{ id: string; name: string; universityId: string; department: string }[]>("/api/members").catch(() => []),
+    apiFetch<MemberSummary[]>("/api/members").catch(() => [] as MemberSummary[]),
     apiFetch<{ presentIds: string[] }>(`/api/attendance?eventName=${encodeURIComponent(eventName)}&eventDate=${today}`).catch(() => ({ presentIds: [] })),
   ]);
 
