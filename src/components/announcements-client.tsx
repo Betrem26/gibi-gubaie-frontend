@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Bell, Pin, Plus, Trash2, Edit2 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import AnnouncementForm from './announcement-form';
+import { useApiFetch } from '@/lib/client-fetch';
 
 interface Announcement {
   id: string;
@@ -19,6 +20,7 @@ interface AnnouncementsClientProps {
 }
 
 export default function AnnouncementsClient({ initialAnnouncements }: AnnouncementsClientProps) {
+  const apiFetch  = useApiFetch();
   const [announcements, setAnnouncements] = useState<Announcement[]>(initialAnnouncements);
   const [showForm, setShowForm] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
@@ -30,23 +32,13 @@ export default function AnnouncementsClient({ initialAnnouncements }: Announceme
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this announcement?')) {
-      return;
-    }
-
+    if (!confirm('Are you sure you want to delete this announcement?')) return;
     setDeleting(id);
     try {
-      const response = await fetch(`/api/announcements?id=${id}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        setAnnouncements(announcements.filter((a) => a.id !== id));
-      } else {
-        alert('Failed to delete announcement');
-      }
-    } catch (error) {
-      alert('Error deleting announcement');
+      await apiFetch(`/api/announcements?id=${id}`, { method: 'DELETE' });
+      setAnnouncements(announcements.filter((a) => a.id !== id));
+    } catch {
+      alert('Failed to delete announcement');
     } finally {
       setDeleting(null);
     }

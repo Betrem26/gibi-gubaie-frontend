@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { Search, Save, Users, CheckCircle, Calendar } from "lucide-react";
 import { Department } from "@/types/index";
+import { useApiFetch } from "@/lib/client-fetch";
 
 type Member = { id: string; name: string; universityId: string; department: Department };
 
@@ -56,6 +57,8 @@ export default function AttendanceClientPage({
   const [saved, setSaved]           = useState(false);
   const [saveError, setSaveError]   = useState<string | null>(null);
 
+  const apiFetch = useApiFetch();
+
   function toggle(id: string) {
     setSaved(false); setSaveError(null);
     setPresent((prev) => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -69,23 +72,17 @@ export default function AttendanceClientPage({
   async function save() {
     setSaving(true); setSaveError(null);
     try {
-      const res = await fetch("/api/attendance", {
+      await apiFetch("/api/attendance", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           eventName, eventDate,
           presentIds: Array.from(present),
           allIds: members.map((m) => m.id),
         }),
       });
-      if (!res.ok) {
-        const json = await res.json().catch(() => ({}));
-        setSaveError(json.error ?? "Failed to save. Please try again.");
-      } else {
-        setSaved(true);
-      }
-    } catch {
-      setSaveError("Network error — please check your connection.");
+      setSaved(true);
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Failed to save. Please try again.");
     } finally {
       setSaving(false);
     }

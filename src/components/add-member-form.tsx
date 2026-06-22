@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { UserPlus, X } from "lucide-react";
 import { Department, GibiRole, DEPARTMENTS, GIBI_ROLES } from "@/types/index";
+import { useApiFetch } from "@/lib/client-fetch";
 
 const DEPARTMENTS_LIST = DEPARTMENTS;
 const ROLES = GIBI_ROLES;
@@ -19,6 +20,7 @@ const DEPT_LABELS: Record<Department, string> = {
 };
 
 export default function AddMemberForm() {
+  const apiFetch  = useApiFetch();
   const [open, setOpen]       = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
@@ -37,25 +39,18 @@ export default function AddMemberForm() {
     const data = Object.fromEntries(new FormData(form));
 
     try {
-      const res  = await fetch("/api/members", {
+      const member = await apiFetch("/api/members", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      const json = await res.json().catch(() => ({}));
-
-      if (!res.ok) {
-        setError(json.error ?? "Failed to save member. Please try again.");
-        setLoading(false);
-        return;
-      }
+      void member; // success
 
       setSuccess(true);
       setLoading(false);
       form.reset();
       setTimeout(() => { handleClose(); window.location.reload(); }, 900);
-    } catch {
-      setError("Network error — please check your connection.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Network error — please check your connection.");
       setLoading(false);
     }
   }

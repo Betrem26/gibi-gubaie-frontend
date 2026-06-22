@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ArrowDownCircle, ArrowUpCircle, PlusCircle, Receipt } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { useApiFetch } from "@/lib/client-fetch";
 
 type Member  = { id: string; name: string; universityId: string };
 type Payment = { id: string; amount: number; month: string; isPaid: boolean; note: string | null; user: { name: string; universityId: string } };
@@ -19,6 +20,7 @@ export default function FinanceClientPage({
   expenses: Expense[];
   members: Member[];
 }) {
+  const apiFetch  = useApiFetch();
   const [tab, setTab]             = useState<"payments" | "expenses">("payments");
   const [form, setForm]           = useState<FormType>(null);
   const [saving, setSaving]       = useState(false);
@@ -35,18 +37,15 @@ export default function FinanceClientPage({
     setFormError(null);
     const data = Object.fromEntries(new FormData(e.currentTarget));
     try {
-      const res  = await fetch("/api/finance", {
+      await apiFetch("/api/finance", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...data, type: form }),
       });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) { setFormError(json.error ?? "Failed to record. Please try again."); setSaving(false); return; }
       setSaving(false);
       setForm(null);
       window.location.reload();
-    } catch {
-      setFormError("Network error — please check your connection.");
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : "Network error — please check your connection.");
       setSaving(false);
     }
   }

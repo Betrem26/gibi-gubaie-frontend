@@ -4,16 +4,14 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { CouncilSection, CouncilRole } from "@/types/index";
 import {
-  ROLE_LABELS,
-  ROLE_STYLES,
-  SECTION_TO_SLUG,
-  SECTION_SUB_SECTIONS,
-  SECTION_DATA,
+  ROLE_LABELS, ROLE_STYLES, SECTION_TO_SLUG,
+  SECTION_SUB_SECTIONS, SECTION_DATA,
 } from "@/lib/council-data";
 import {
   Search, UserPlus, Pencil, X, Check,
   Mail, Phone, GraduationCap, ChevronRight, Layers,
 } from "lucide-react";
+import { useApiFetch } from "@/lib/client-fetch";
 
 // ── Exported meta type (no icon — safe to pass from server) ──────────────────
 export interface SerializableSectionMeta {
@@ -86,6 +84,7 @@ function SubSectionSelect({
 function AddMemberModal({ defaultSection, defaultSubSection, onClose }: {
   defaultSection: CouncilSection; defaultSubSection: string | null; onClose: () => void;
 }) {
+  const apiFetch  = useApiFetch();
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -95,12 +94,10 @@ function AddMemberModal({ defaultSection, defaultSubSection, onClose }: {
     setLoading(true); setError(null);
     const data = Object.fromEntries(new FormData(e.currentTarget));
     try {
-      const res  = await fetch("/api/council", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) { setError(json.error ?? "Failed to add member."); setLoading(false); return; }
+      await apiFetch("/api/council", { method: "POST", body: JSON.stringify(data) });
       setSuccess(true); setLoading(false);
       setTimeout(() => { onClose(); window.location.reload(); }, 800);
-    } catch { setError("Network error."); setLoading(false); }
+    } catch (err) { setError(err instanceof Error ? err.message : "Network error."); setLoading(false); }
   }
 
   return (
@@ -178,6 +175,7 @@ function AddMemberModal({ defaultSection, defaultSubSection, onClose }: {
 
 // ── Edit Member Modal ─────────────────────────────────────────────────────────
 function EditMemberModal({ member, onClose }: { member: CouncilMemberRow; onClose: () => void; }) {
+  const apiFetch  = useApiFetch();
   const [saving,  setSaving]  = useState(false);
   const [error,   setError]   = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -187,12 +185,10 @@ function EditMemberModal({ member, onClose }: { member: CouncilMemberRow; onClos
     setSaving(true); setError(null);
     const data = Object.fromEntries(new FormData(e.currentTarget));
     try {
-      const res  = await fetch("/api/council", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: member.id, ...data }) });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) { setError(json.error ?? "Failed to update."); setSaving(false); return; }
+      await apiFetch("/api/council", { method: "PATCH", body: JSON.stringify({ id: member.id, ...data }) });
       setSuccess(true); setSaving(false);
       setTimeout(() => { onClose(); window.location.reload(); }, 800);
-    } catch { setError("Network error."); setSaving(false); }
+    } catch (err) { setError(err instanceof Error ? err.message : "Network error."); setSaving(false); }
   }
 
   return (

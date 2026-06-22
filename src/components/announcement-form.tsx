@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Bell, X, Send, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useApiFetch } from '@/lib/client-fetch';
 
 interface AnnouncementFormProps {
   onClose: () => void;
@@ -14,6 +15,7 @@ interface AnnouncementFormProps {
 }
 
 export default function AnnouncementForm({ onClose, editingAnnouncement }: AnnouncementFormProps) {
+  const apiFetch  = useApiFetch();
   const [title, setTitle] = useState(editingAnnouncement?.title || '');
   const [body, setBody] = useState(editingAnnouncement?.body || '');
   const [isPinned, setIsPinned] = useState(editingAnnouncement?.isPinned || false);
@@ -68,23 +70,10 @@ export default function AnnouncementForm({ onClose, editingAnnouncement }: Annou
             sendSMS,
           };
 
-      const response = await fetch('/api/announcements', {
+      const data = await apiFetch<{ smsStatus?: { sent: number; failed: number; total: number } }>('/api/announcements', {
         method,
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-
-      console.log(`[AnnouncementForm] Response status:`, response.status);
-
-      const data = await response.json();
-
-      console.log(`[AnnouncementForm] Response data:`, data);
-
-      if (!response.ok) {
-        setError(data.error || `Failed to ${isEditing ? 'update' : 'post'} announcement (${response.status})`);
-        setLoading(false);
-        return;
-      }
 
       // Show SMS status if applicable
       if (data.smsStatus) {

@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { Search, SlidersHorizontal, Pencil, X, Check } from "lucide-react";
 import { Department, GibiRole, DEPARTMENTS, GIBI_ROLES } from "@/types/index";
 import { MemberWithStats } from "@/types";
+import { useApiFetch } from "@/lib/client-fetch";
 
 const DEPT_LABELS: Record<Department, string> = {
   EDUCATION: "Education",
@@ -43,13 +44,8 @@ const ROLE_LABELS: Record<GibiRole, string> = {
 type DeptFilter = "ALL" | Department;
 
 // ── Edit Modal ────────────────────────────────────────────────────────────────
-function EditMemberModal({
-  member,
-  onClose,
-}: {
-  member: MemberWithStats;
-  onClose: () => void;
-}) {
+function EditMemberModal({ member, onClose }: { member: MemberWithStats; onClose: () => void; }) {
+  const apiFetch  = useApiFetch();
   const [saving, setSaving]   = useState(false);
   const [error, setError]     = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -60,18 +56,15 @@ function EditMemberModal({
     setError(null);
     const data = Object.fromEntries(new FormData(e.currentTarget));
     try {
-      const res  = await fetch("/api/members", {
+      await apiFetch("/api/members", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: member.id, ...data }),
       });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) { setError(json.error ?? "Failed to update."); setSaving(false); return; }
       setSuccess(true);
       setSaving(false);
       setTimeout(() => { onClose(); window.location.reload(); }, 800);
-    } catch {
-      setError("Network error.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Network error.");
       setSaving(false);
     }
   }
